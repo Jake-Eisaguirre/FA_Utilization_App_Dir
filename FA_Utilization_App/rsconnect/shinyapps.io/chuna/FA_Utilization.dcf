@@ -1,0 +1,10 @@
+name: FA_Utilization
+title:
+username: chuna
+account: chuna
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12768918
+bundleId: 9141311
+url: https://chuna.shinyapps.io/FA_Utilization/
+version: 1

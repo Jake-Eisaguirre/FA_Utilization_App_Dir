@@ -1,0 +1,88 @@
+library(writexl)
+library(shinyWidgets)
+library(here)
+library(shinycssloaders)
+library(lubridate)
+library(plotly)
+library(DT)
+library(padr)
+library(tidyverse)
+library(odbc)
+library(DBI)
+library(shiny)
+
+bases <- c("HNL", "LAX")
+
+
+# bid_periods <- read_csv(here("FA_Utilization_App", "data", "bid_periods.csv"))
+# 
+# fa_rsk_sop <- read_csv(here("FA_Utilization_App", "data", "fa_rsk_sop.csv"))%>%
+#   mutate(weekday = wday(PAIRING_DATE, label = T)) %>%
+#   rename(DATE = PAIRING_DATE)
+# 
+# hline_data <- read_csv(here("FA_Utilization_App", "data", "hline_data.csv")) %>%
+#   mutate(weekday = wday(DATE, label = T))
+# 
+# label_data <- read_csv(here("FA_Utilization_App", "data", "label_data.csv"))%>%
+#   mutate(weekday = wday(DATE, label = T))
+# 
+# label_data_used <- read_csv(here("FA_Utilization_App", "data", "label_data_used.csv"))%>%
+#   mutate(weekday = wday(DATE, label = T))
+# 
+# long_data <- read_csv(here("FA_Utilization_App", "data", "long_data.csv"))%>%
+#   mutate(weekday = wday(DATE, label = T))
+# 
+# long_data_deg_fa <- read_csv(here("FA_Utilization_App", "data", "long_data_deg_fa.csv"))%>%
+#   mutate(weekday = wday(PAIRING_DATE, label = T)) %>%
+#   rename(DATE = PAIRING_DATE)
+# 
+# sum_fa_rsk_sop_t <- read_csv(here("FA_Utilization_App", "data", "sum_fa_rsk_sop_t.csv"))%>%
+#   mutate(weekday = wday(PAIRING_DATE, label = T)) %>%
+#   rename(DATE = PAIRING_DATE)
+# 
+# 
+# tot_label <- read_csv(here("FA_Utilization_App", "data", "tot_label.csv"))%>%
+#   mutate(weekday = wday(DATE, label = T))
+# 
+# utl_df <- read_csv(here("FA_Utilization_App", "data", "utl_df.csv")) %>%
+#   mutate(weekday = wday(DATE, label = T))
+
+
+bid_periods <- read_csv(here("data", "bid_periods.csv"))
+
+fa_rsk_sop <- read_csv(here("data", "fa_rsk_sop.csv"))%>%
+  mutate(weekday = wday(PAIRING_DATE, label = T)) %>%
+  rename(DATE = PAIRING_DATE)
+
+hline_data <- read_csv(here("data", "hline_data.csv")) %>%
+  mutate(weekday = wday(DATE, label = T))
+
+label_data <- read_csv(here("data", "label_data.csv"))%>%
+  mutate(weekday = wday(DATE, label = T))
+
+label_data_used <- read_csv(here("data", "label_data_used.csv"))%>%
+  mutate(weekday = wday(DATE, label = T))
+
+long_data <- read_csv(here("data", "long_data.csv"))%>%
+  mutate(weekday = wday(DATE, label = T))
+
+long_data_deg_fa <- read_csv(here("data", "long_data_deg_fa.csv"))%>%
+  mutate(weekday = wday(PAIRING_DATE, label = T)) %>%
+  rename(DATE = PAIRING_DATE)
+
+sum_fa_rsk_sop_t <- read_csv(here("data", "sum_fa_rsk_sop_t.csv"))%>%
+  mutate(weekday = wday(PAIRING_DATE, label = T)) %>%
+  rename(DATE = PAIRING_DATE)
+
+
+tot_label <- read_csv(here("data", "tot_label.csv"))%>%
+  mutate(weekday = wday(DATE, label = T))
+
+utl_df <- read_csv(here("data", "utl_df.csv")) %>%
+  mutate(weekday = wday(DATE, label = T))
+
+dynamic_text_size <- function(x_range, num_points, base_size = 5) {
+  # Scale the text size based on the x-axis range and the number of points
+  scaling_factor <- (x_range / num_points) * 0.5  # Lower multiplier
+  return(base_size * scaling_factor)
+}
