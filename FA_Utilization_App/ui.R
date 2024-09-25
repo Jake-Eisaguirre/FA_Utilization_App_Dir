@@ -1,11 +1,12 @@
 
-#source(here("FA_Utilization_App/global.R"))
+source(here("FA_Utilization_App/global.R"))
 
-source(here("global.R"))
+#source(here("global.R"))
 
 
 # Define UI
-ui <- fluidPage(
+ui <- secure_app(fluidPage(
+  
   tags$head(
     tags$style(HTML("
       body {
@@ -85,8 +86,8 @@ ui <- fluidPage(
   
   div(
     h3("Data Background"),
-    HTML("
-    Data presented in this report is aggregated across the <strong>CT_MASTER_HISTORY</strong> table from the Snowflake Database within the <strong>CREW ANALYTICS</strong> Schema.
+    HTML('
+    Data presented in this report is aggregated across the <a href="https://app.snowflake.com/halorg/hawaiianair/#/data/databases/ENTERPRISE/schemas/CREW_ANALYTICS/view/CT_MASTER_HISTORY/data-preview" target="_blank" style="color:#413691"><strong>CT_MASTER_HISTORY</strong></a> table from the Snowflake Database within the <a href="https://app.snowflake.com/halorg/hawaiianair/#/data/databases/ENTERPRISE/schemas/CREW_ANALYTICS" target="_blank" style="color:#413691"><strong>CREW_ANALYTICS</strong></a> Schema.
     For the purpose of this report, reserve utilization is defined as an employee having an <strong>RLV</strong> code and receiving an <strong>ASN</strong>, <strong>BSN</strong>, or <strong>BRD</strong>
     code for a given day.
     The <strong>RLV</strong> head count per day is determined by the count of distinct employees per day on the 25th of the preceding bid period; This is prior to when FAs can trade RLV days.
@@ -94,7 +95,7 @@ ui <- fluidPage(
     For the sick code figure and data; sick codes are defined as <strong>SOP</strong>, <strong>2SK</strong>, <strong>FLV</strong>, <strong>FLP</strong>, <strong>UNA</strong>, <strong>FLS</strong>, <strong>FLU</strong>, <strong>N/S</strong>, <strong>PER</strong>, <strong>MGR</strong>.
     The sick code figure visualizes the final sick code associated with the employee following an assignment determined by the greatest value associated for Update Date and Time column per day per employee.
     The sick code table provides all the sick codes within the transaction following the assignment.
-  "),
+  '),
     tags$hr(class = "solid-line")),
   
   div(h3("Daily Reserve Utilization and Sick Codes")),
@@ -102,20 +103,6 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(width=2,
                  class = "sidebar-panel",
-                 airDatepickerInput(
-                   inputId = "date_input",
-                   label = "Select:",
-                   placeholder = "Placeholder",
-                   multiple = 5, 
-                   clearButton = TRUE,
-                   minDate = min(utl_df$DATE),
-                   maxDate = max(utl_df$DATE),
-                   range=T,
-                   value = c(
-                     min(utl_df$DATE[utl_df$BID_PERIOD == max(utl_df$BID_PERIOD)]),
-                     max(utl_df$DATE[utl_df$BID_PERIOD == max(utl_df$BID_PERIOD)])
-                   )
-                 ),
                  pickerInput("bid_periods_input", "Bid Period",
                              options = pickerOptions(
                                actionsBox = TRUE, 
@@ -124,7 +111,7 @@ ui <- fluidPage(
                              ), 
                              choices =bid_periods$BID_PERIOD, multiple = T,
                              selected = max(bid_periods$BID_PERIOD)),
-                 pickerInput("bases", "Base", choices = NULL, 
+                 pickerInput("bases", "Base", choices = bases, 
                              selected = c("HNL")),
                  pickerInput("weekday", "Weekday", choices = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"), 
                              selected = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
@@ -145,7 +132,15 @@ ui <- fluidPage(
                              ), 
                              selected = c("SOP", "2SK", "FLV", "FLP", 
                                           "UNA", "FLS", "FLU", "N/S", 
-                                          "PER", "MGR"))
+                                          "PER", "MGR")),
+                 pickerInput("asn_codes", "Assignment Codes", choices = c("ASN", "BRD", "BSN"), 
+                             selected = c("ASN", "BRD", "BSN"),
+                             multiple = T,
+                             options = pickerOptions(
+                               actionsBox = TRUE, 
+                               size = 10,
+                               selectedTextFormat = "count > 3"
+                             ))
     ),
 
 # -------------------------------------------------------------------------
@@ -169,5 +164,5 @@ ui <- fluidPage(
               )
     )
   )
-)
+))
 
