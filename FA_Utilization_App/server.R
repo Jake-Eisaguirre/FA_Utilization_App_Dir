@@ -76,6 +76,19 @@ server <- function(input, output, session) {
              m_avg_utl = round(mean(m_avg_utl), 0)) 
   })
   
+  # Download handler for Excel file
+  output$download_utl_table <- downloadHandler(
+    filename = function() {
+      paste("utl_table_", input$bid_periods_input, ".xlsx", sep = "")
+    },
+    content = function(file) {
+      writexl::write_xlsx(reserve_utl(), path = file)
+    }
+  )
+  
+  
+  
+  
   h_line_label_p_utl <- reactive({
     utl_df %>% 
       filter(BID_PERIOD %in% c(input$bid_periods_input),

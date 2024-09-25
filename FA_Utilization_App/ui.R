@@ -88,11 +88,11 @@ ui <- secure_app(fluidPage(
     h3("Data Background"),
     HTML('
     Data presented in this report is aggregated across the <a href="https://app.snowflake.com/halorg/hawaiianair/#/data/databases/ENTERPRISE/schemas/CREW_ANALYTICS/view/CT_MASTER_HISTORY/data-preview" target="_blank" style="color:#413691"><strong>CT_MASTER_HISTORY</strong></a> table from the Snowflake Database within the <a href="https://app.snowflake.com/halorg/hawaiianair/#/data/databases/ENTERPRISE/schemas/CREW_ANALYTICS" target="_blank" style="color:#413691"><strong>CREW_ANALYTICS</strong></a> Schema.
-    For the purpose of this report, reserve utilization is defined as an employee having an <strong>RLV</strong> code and receiving an <strong>ASN</strong>, <strong>BSN</strong>, or <strong>BRD</strong>
+    For the purpose of this report, reserve utilization is defined as an employee having an <strong title = "Reserve">RLV</strong> code and receiving an <strong title="Reserve Assignment">ASN</strong>, <strong title="International Boarding Assignment">BSN</strong>, or <strong title="Neighbor Island Boarding Assignment">BRD</strong>
     code for a given day.
-    The <strong>RLV</strong> head count per day is determined by the count of distinct employees per day on the 25th of the preceding bid period; This is prior to when FAs can trade RLV days.
+    The <strong title = "Reserve">RLV</strong> head count per day is determined by the count of distinct employees per day on the 25th of the preceding bid period; This is prior to when FAs can trade RLV days.
     The black dashed line presented on the first figure indicates the average utilization for the given bid period.
-    For the sick code figure and data; sick codes are defined as <strong>SOP</strong>, <strong>2SK</strong>, <strong>FLV</strong>, <strong>FLP</strong>, <strong>UNA</strong>, <strong>FLS</strong>, <strong>FLU</strong>, <strong>N/S</strong>, <strong>PER</strong>, <strong>MGR</strong>.
+    For the sick code figure and data; sick codes are defined as <strong title = "Sick w/ Out Pay">SOP</strong>, <strong title="Sick Leave">2SK</strong>, <strong title="Family Leave Vacation">FLV</strong>, <strong title="Family Leave PER">FLP</strong>, <strong title="Unavailable">UNA</strong>, <strong title="Family Leave Sick">FLS</strong>, <strong title="FMLA No Sick">FLU</strong>, <strong title="No Show">N/S</strong>, <strong title="PLWOP">PER</strong>, <strong title="Medical Grounding">MGR</strong>.
     The sick code figure visualizes the final sick code associated with the employee following an assignment determined by the greatest value associated for Update Date and Time column per day per employee.
     The sick code table provides all the sick codes within the transaction following the assignment.
   '),
@@ -151,7 +151,10 @@ ui <- secure_app(fluidPage(
               tabsetPanel(
                 tabPanel("Reserve Utilization", 
                          withSpinner(plotlyOutput('plot_utl', height = "600px"), color = getOption("spinner.color", default = "#D2058A")),
-                         tags$hr(class = "solid-line")
+                         tags$hr(class = "solid-line"),
+                         tags$br(),
+                         downloadButton("download_utl_table", "Download as Excel File",
+                                        style = "background-color: #217346; color: white; border: none; padding: 10px 20px;")
                 ),
                 tabPanel("Sick After ASN", 
                          withSpinner(plotlyOutput('plotly_sic', height = "400px"), color = getOption("spinner.color", default = "#D2058A")),
