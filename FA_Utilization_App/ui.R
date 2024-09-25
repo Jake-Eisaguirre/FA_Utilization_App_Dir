@@ -1,7 +1,7 @@
 
-source(here("FA_Utilization_App/global.R"))
+#source(here("FA_Utilization_App/global.R"))
 
-#source(here("global.R"))
+source(here("global.R"))
 
 
 # Define UI
@@ -73,6 +73,25 @@ ui <- secure_app(fluidPage(
       .nav-tabs > li > a {
         color: #D2058A;
       }
+      
+
+
+
+  .bootstrap-select .dropdown-menu .active {
+    background-color: #D2058A !important; /* Active (hover) background color */
+    color: white !important; /* White text for active items */
+  }
+
+  .bootstrap-select .btn {
+    color: #D2058A !important; /* Text color for the selected text */
+    background-color: white !important; /* Button background color */
+    border-color: #D2058A !important; /* Border color */
+  }
+
+  .bootstrap-select .dropdown-toggle {
+    color: #D2058A !important; /* Text color for the dropdown */
+    border: none !important; /* Remove border for a cleaner look */
+  }
       
 
     "))

@@ -1,8 +1,8 @@
-# source(here("global.R"))
-# source(here("ui.R"))
+source(here("global.R"))
+source(here("ui.R"))
 
-source(here("FA_Utilization_App/global.R"))
-source(here("FA_Utilization_App/ui.R"))
+#source(here("FA_Utilization_App/global.R"))
+#source(here("FA_Utilization_App/ui.R"))
 
 # Define server logic
 server <- function(input, output, session) {
@@ -14,58 +14,6 @@ server <- function(input, output, session) {
   })
   
   
-# 
-#   update_bid_periods <- reactive({
-#     # Ensure input$date_input has valid dates before filtering
-#     req(input$date_input)
-#     
-#     # Filter the data based on the selected date range
-#     filtered_df <- utl_df %>% 
-#       filter(DATE >= input$date_input[1],   # Start of date range
-#              DATE <= input$date_input[2])   # End of date range
-#     
-#     # Extract unique BID_PERIOD values from the filtered data
-#     unique(filtered_df$BID_PERIOD)
-#   })
-#   
-#   # Update the bid_periods PickerInput based on the selected date range
-#   observe({
-#     updatePickerInput(session, 
-#                       inputId = "bid_periods_input", 
-#                       choices = bid_periods$BID_PERIOD)  # Default to the latest BID_PERIOD
-#   })
-#   
-#   
-# #   # Reactive expression to update date range based on selected BID_PERIOD
-#   update_calendar_periods <- reactive({
-#     req(input$bid_periods_input)  # Ensure a BID_PERIOD is selected
-# 
-#     # Filter data based on the selected BID_PERIOD(s)
-#     utl_df %>%
-#       filter(BID_PERIOD %in% input$bid_periods_input)  # Filter for selected BID_PERIOD
-#   })
-# 
-#   # Update the airDatepickerInput's value based on selected BID_PERIOD
-#   observe({
-#     # Get the filtered data for selected BID_PERIOD(s)
-#     filtered_df_bp <- update_calendar_periods()
-# 
-#     # Check if there are valid DATE values
-#     if (nrow(filtered_df_bp) > 0) {
-#       # Update the date input with a date range based on the filtered data
-#       updateAirDateInput(session,
-#                          inputId = "date_input",
-#                          value = c(min(filtered_df_bp$DATE), max(filtered_df_bp$DATE)))  # Set the date range as value
-#     }
-#   })
-# 
-# 
-#   
-  
-  # updatePickerInput(session, "bases", choices = bases,
-  #                   selected = "HNL")
-  # 
-
 
   reserve_utl <- reactive({
     utl_df %>% 
@@ -169,63 +117,103 @@ server <- function(input, output, session) {
   
   
   output$plot_utl <- renderPlotly({
-    
-    reserve_data <- reserve_utl()
-    
-    # Calculate the range of the x-axis (DATE) based on the data
-    min_date <- min(reserve_utl()$DATE)-1
-    max_date <- max(reserve_utl()$DATE)+1
-    
-    # Generate a sequence of dates for 3-day intervals within the selected date range
-    seq_dates <- seq(from = min_date, to = max_date, by = "3 days")
-    
-    # Calculate the range of the x-axis (DATE) and the number of data points
-    x_range <- as.numeric(max(reserve_utl()$DATE) - min(reserve_utl()$DATE))
-    num_points <- nrow(reserve_utl())
-    
-    # Calculate the dynamic text size based on x-axis range and number of points
-    dynamic_size <- dynamic_text_size(x_range, num_points)
-    
-    
-    # Create the ggplot object
-    utl_p <- ggplot(reserve_utl()) +
-      geom_bar(aes(x = DATE, y = net_rlv_available,
-                   text = paste("Date:", DATE, "<br>Weekday:", weekday, "<br>RLV Available:", net_rlv_available)), 
-               stat = "identity", alpha = 0.3, width = 0.85) +  # Adjust width as needed
-      geom_bar(data = long_data_rec(), 
-               aes(x = DATE, y = Head_Count, fill = rlv_type, 
-                   text = paste0("Date:", DATE, "<br>Weekday:", weekday, "<br>", rlv_type, ": ", Head_Count)), 
-               stat = "identity", position = "stack", width = 0.85) +  # Adjust width as needed
-      scale_x_date(breaks = seq_dates,
-                   labels = function(x) ifelse(x %in% reserve_data$DATE, format(x, "%Y-%m-%d"), "")) +  # Conditional labeling +
-      scale_fill_manual(values = c("RLV Available" = "#413691", 
-                                   "RLV Utilized" = "#D2058A")) +
-      labs(x = "Date", y = "Primary RLV Head Count", fill = "RLV Type") +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1),
-            legend.text = element_text(size = 9),
-            legend.key.size = unit(0.35, "cm"),
-            legend.title = element_text(size = 5),
-            legend.box.spacing = unit(0.35, "cm"),
-            plot.title = element_text(hjust = 1.5)) +
-      ggtitle(paste0(input$bases, " - ", tot_label_rec()$tot, " Total Reserves Across Bid Periods")) +
-      geom_text(data = label_data_rec(),
-                aes(x = DATE, y = net_rlv_available + (0.025 * max(net_rlv_available)), 
-                    label = net_rlv_available),
-                size = dynamic_size, vjust = -0.75, hjust = 0.5) +
-      geom_text(data = label_data_used_rec(),
-                aes(x = DATE, y = (rlv_used + (0.025 * max(rlv_used))), 
-                    label = perc_ut),
-                size = dynamic_size, vjust = -0.75, color = "lightgrey") +
-      geom_hline(aes(yintercept = hline_data_rec()$yintercept), linetype = "dashed", color = "black") +
-      geom_text(aes(x = (max(reserve_utl()$DATE)+1),
-                    y = (h_line_label_p_utl()$m_avg_utl+5)), label = paste(h_line_label_p_utl()$m_perc_utl, "%"),
-                vjust = -1, hjust = 0, color = "black", size = 2.5) +
-      coord_cartesian(ylim = c(0, NA))
-    
-    # Convert to plotly with the tooltip containing the weekday
-    ggplotly(utl_p, tooltip = "text")
+    tryCatch({
+      reserve_data <- reserve_utl()
+      
+      # Calculate the range of the x-axis (DATE) based on the data
+      min_date <- min(reserve_utl()$DATE)
+      max_date <- max(reserve_utl()$DATE)
+      
+      # Convert dates to character strings, but first sort them by the original DATE order
+      sorted_dates <- reserve_utl()$DATE[order(reserve_utl()$DATE)]
+      date_strings <- format(sorted_dates, "%Y-%m-%d")
+      
+      # Select every 3rd date from the sorted date strings
+      seq_dates <- date_strings[seq(1, length(date_strings), by = 3)]
+      
+      # Calculate the range of the x-axis (DATE) and the number of data points
+      x_range <- as.numeric(max(reserve_utl()$DATE) - min(reserve_utl()$DATE))
+      num_points <- nrow(reserve_utl())
+      
+      # Calculate the dynamic text size based on x-axis range and number of points
+      dynamic_size <- dynamic_text_size(x_range, num_points)
+      
+      # Create the ggplot object
+      utl_p <- ggplot(reserve_utl()) +
+        geom_bar(aes(x = as.character(DATE), y = net_rlv_available,
+                     text = paste("Date:", DATE, "<br>Weekday:", weekday, "<br>RLV Available:", net_rlv_available)), 
+                 stat = "identity", alpha = 0.3, width = 0.85) +  # Adjust width as needed
+        geom_bar(data = long_data_rec(), 
+                 aes(x = as.character(DATE), y = Head_Count, fill = rlv_type, 
+                     text = paste0("Date:", DATE, "<br>Weekday:", weekday, "<br>", rlv_type, ": ", Head_Count)), 
+                 stat = "identity", position = "stack", width = 0.85) +  # Adjust width as needed
+        scale_x_discrete(breaks = seq_dates, labels = seq_dates) +  # Conditional labeling
+        scale_fill_manual(values = c("RLV Available" = "#413691", 
+                                     "RLV Utilized" = "#D2058A")) +
+        labs(x = "Date", y = "Primary RLV Head Count", fill = "RLV Type") +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1),
+              legend.text = element_text(size = 9),
+              legend.key.size = unit(0.35, "cm"),
+              legend.title = element_text(size = 5),
+              legend.box.spacing = unit(0.35, "cm"),
+              plot.title = element_text(hjust = 1.5)) +
+        ggtitle(paste0(input$bases, " - ", tot_label_rec()$tot, " Total Reserves Across Bid Periods")) +
+        geom_text(data = label_data_rec(),
+                  aes(x = as.character(DATE), y = net_rlv_available + (0.025 * max(net_rlv_available)), 
+                      label = net_rlv_available),
+                  size = dynamic_size, vjust = -0.75, hjust = 0.5) +
+        geom_text(data = label_data_used_rec(),
+                  aes(x = as.character(DATE), y = (rlv_used + (0.025 * max(rlv_used))), 
+                      label = perc_ut),
+                  size = dynamic_size, vjust = -0.75, color = "lightgrey") +
+        geom_hline(aes(yintercept = hline_data_rec()$yintercept), linetype = "dashed", color = "#00A5BA") +
+        geom_text(aes(x = as.character(max(reserve_utl()$DATE)+1),
+                      y = (h_line_label_p_utl()$m_avg_utl + 5)), label = paste(h_line_label_p_utl()$m_perc_utl, "%"),
+                  vjust = -1, hjust = 0, color = "#00A5BA", size = 2.5) +
+        coord_cartesian(ylim = c(0, NA))
+      
+      # Convert to plotly with the tooltip containing the weekday
+      ggplotly(utl_p, tooltip = "text")
+      
+    }, error = function(e) {
+      plotly_empty() %>%
+        layout(
+          title = list(text = "Please Make a Selection",
+                       font = list(size = 24, color = "red"),
+                       x = 0.5,  # Centered horizontally
+                       y = 0.95  # Vertical positioning
+          ),
+          xaxis = list(
+            title = "Date", 
+            range = c(1, 10),  # Dummy x-axis range
+            showgrid = TRUE,
+            zeroline = FALSE,
+            tickvals = 1:10,  # Dummy tick values
+            ticktext = format(seq(Sys.Date() - 9, Sys.Date(), by = 1), "%Y-%m-%d")  # Dummy dates
+          ),
+          yaxis = list(
+            title = "Head Count", 
+            range = c(0, 100),  # Dummy y-axis range
+            showgrid = TRUE,
+            zeroline = FALSE
+          ),
+          annotations = list(
+            list(
+              x = 0.5, y = 0.5, 
+              text = "Please Make a Selection", 
+              showarrow = FALSE, 
+              font = list(size = 16, color = "grey")
+            )
+          ),
+          margin = list(l = 50, r = 50, t = 80, b = 60),
+          paper_bgcolor = "grey95",  # Background color
+          plot_bgcolor = "white"        # Plot area background
+        )
+      
+    })
   })
+  
   
   
 

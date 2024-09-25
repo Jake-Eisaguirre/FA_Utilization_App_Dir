@@ -325,6 +325,11 @@ for (j in seq_along(bases)) {
              wrap_dif = TO_TIME - FROM_TIME) %>% 
       group_by(CREW_ID, PAIRING_DATE) %>% 
       filter(wrap_dif == max(wrap_dif)) %>% 
+      ungroup() %>% 
+      group_by(CREW_ID, PAIRING_DATE, TRANSACTION_CODE) %>% 
+      mutate(temp_id = cur_group_id()) %>% 
+      filter(!duplicated(temp_id)) %>% 
+      ungroup() %>% 
       select(CREW_ID, PAIRING_DATE, FROM_TIME, TO_TIME) 
     
     sum_fa_rsk_sop_t_hnl <- left_join(sum_fa_rsk_sop_t_hnl, wrap_time, by = c("CREW_ID", "PAIRING_DATE"))
